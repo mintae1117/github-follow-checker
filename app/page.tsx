@@ -232,7 +232,16 @@ function HomeContent() {
           <UserList />
         </Card>
 
-        <Footer>Searching for: @{username || "Enter a username above"}</Footer>
+        <Footer>
+          Made by{" "}
+          <a
+            href="https://github.com/mintae1117"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            @mintae1117
+          </a>
+        </Footer>
       </Content>
     </Container>
   );
