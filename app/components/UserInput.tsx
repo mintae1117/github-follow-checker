@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import styled from "styled-components";
-import { FaStar, FaRegStar } from "react-icons/fa";
+import { FaStar, FaRegStar, FaSearch } from "react-icons/fa";
 import { useGithubStore } from "../store/useGithubStore";
 import { useFavoritesStore } from "../store/useFavoritesStore";
 import { useAuthStore } from "../store/useAuthStore";
@@ -72,7 +72,7 @@ const StarButton = styled.button<{ $isFavorite: boolean }>`
 `;
 
 const Button = styled.button`
-  padding: 14px 28px;
+  padding: 14px 22px;
   background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   color: white;
   border: none;
@@ -91,6 +91,21 @@ const Button = styled.button`
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+  }
+`;
+
+const LoadingSpinner = styled.div`
+  width: 20px;
+  height: 20px;
+  border: 4px solid var(--border-color);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -144,7 +159,7 @@ export default function UserInput() {
           </StarButton>
         </InputContainer>
         <Button type="submit" disabled={isLoading || !username.trim()}>
-          {isLoading ? "Loading..." : "Search"}
+          {isLoading ? <LoadingSpinner /> : <FaSearch />}
         </Button>
       </InputWrapper>
     </form>

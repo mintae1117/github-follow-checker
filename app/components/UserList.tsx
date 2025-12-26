@@ -80,7 +80,8 @@ const ProgressDot = styled.span<{ $active: boolean }>`
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: ${(props) => (props.$active ? "#3b82f6" : "var(--text-secondary)")};
+  background: ${(props) =>
+    props.$active ? "#3b82f6" : "var(--text-secondary)"};
 `;
 
 export default function UserList() {
