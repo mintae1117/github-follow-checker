@@ -1,8 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0f0f23;
+  --foreground: #e2e8f0;
+  --card-bg: #1a1a2e;
+  --card-bg-secondary: #16162a;
+  --border-color: #2d2d44;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --hover-bg: #252542;
+  --remove-bg: #374151;
+  --input-bg: #1e1e3f;
+  --input-border: #3d3d5c;
+  --input-text: #f1f5f9;
+  --input-placeholder: #64748b;
+  --gradient-start: #1a1a2e;
+  --gradient-end: #16213e;
 }
 
 @theme inline {
@@ -10,13 +23,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
