@@ -1,11 +1,16 @@
 "use client";
 
+import { Suspense, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import UserInput from "./components/UserInput";
 import TabButton from "./components/TabButton";
 import UserList from "./components/UserList";
 import Favorites from "./components/Favorites";
+import AuthStatus from "./components/AuthStatus";
+import RateLimitBanner from "./components/RateLimitBanner";
 import { useGithubStore } from "./store/useGithubStore";
+import { useAuthStore } from "./store/useAuthStore";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -26,6 +31,14 @@ const Content = styled.div`
   gap: 32px;
 `;
 
+const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+`;
+
 const Title = styled.h1`
   font-size: 2.5rem;
   font-weight: 700;
@@ -42,7 +55,7 @@ const Subtitle = styled.p`
   color: var(--text-secondary);
   text-align: center;
   font-size: 1.1rem;
-  margin-top: -16px;
+  margin-top: -8px;
 `;
 
 const Card = styled.div`
@@ -93,19 +106,50 @@ const Footer = styled.p`
   text-align: center;
 `;
 
-export default function Home() {
-  const { followers, following, unfollowers, notMutuals, username } =
+function AuthHandler() {
+  const searchParams = useSearchParams();
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
+
+  useEffect(() => {
+    const accessToken = searchParams.get("access_token");
+    const authError = searchParams.get("auth_error");
+
+    if (accessToken) {
+      setAccessToken(accessToken);
+      window.history.replaceState({}, "", "/");
+    }
+
+    if (authError) {
+      console.error("Auth error:", authError);
+      window.history.replaceState({}, "", "/");
+    }
+  }, [searchParams, setAccessToken]);
+
+  return null;
+}
+
+function HomeContent() {
+  const { followers, following, unfollowers, notMutuals, username, rateLimitReset } =
     useGithubStore();
   const hasData = followers.length > 0 || following.length > 0;
+
+  useEffect(() => {
+    useAuthStore.persist.rehydrate();
+  }, []);
 
   return (
     <Container>
       <Content>
-        <Title>GitHub Follow Checker</Title>
-        <Subtitle>Find out who is not following you back</Subtitle>
+        <Header>
+          <Title>GitHub Follow Checker</Title>
+          <Subtitle>Find out who is not following you back</Subtitle>
+          <AuthStatus />
+        </Header>
 
         <Card>
           <UserInput />
+
+          {rateLimitReset && <RateLimitBanner />}
 
           <Divider />
 
@@ -144,5 +188,16 @@ export default function Home() {
         <Footer>Searching for: @{username || "Enter a username above"}</Footer>
       </Content>
     </Container>
+  );
+}
+
+export default function Home() {
+  return (
+    <>
+      <Suspense fallback={null}>
+        <AuthHandler />
+      </Suspense>
+      <HomeContent />
+    </>
   );
 }

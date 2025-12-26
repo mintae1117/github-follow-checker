@@ -2,13 +2,42 @@ import { GitHubUser } from "../types/github";
 
 const GITHUB_API_BASE = "https://api.github.com";
 
-async function fetchAllPages(url: string): Promise<GitHubUser[]> {
+export class RateLimitError extends Error {
+  resetTime: number;
+
+  constructor(resetTime: number) {
+    super("GitHub API rate limit exceeded");
+    this.name = "RateLimitError";
+    this.resetTime = resetTime;
+  }
+}
+
+async function fetchAllPages(
+  url: string,
+  token?: string | null
+): Promise<GitHubUser[]> {
   const allUsers: GitHubUser[] = [];
   let page = 1;
   let hasMore = true;
 
+  const headers: HeadersInit = {
+    Accept: "application/vnd.github.v3+json",
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   while (hasMore) {
-    const response = await fetch(`${url}?per_page=100&page=${page}`);
+    const response = await fetch(`${url}?per_page=100&page=${page}`, {
+      headers,
+    });
+
+    if (response.status === 403 || response.status === 429) {
+      const resetHeader = response.headers.get("X-RateLimit-Reset");
+      const resetTime = resetHeader ? parseInt(resetHeader, 10) * 1000 : Date.now() + 3600000;
+      throw new RateLimitError(resetTime);
+    }
 
     if (!response.ok) {
       throw new Error(`GitHub API error: ${response.status}`);
@@ -27,12 +56,24 @@ async function fetchAllPages(url: string): Promise<GitHubUser[]> {
   return allUsers;
 }
 
-export async function fetchFollowers(username: string): Promise<GitHubUser[]> {
-  return fetchAllPages(`${GITHUB_API_BASE}/users/${username}/followers`);
+export async function fetchFollowers(
+  username: string,
+  token?: string | null
+): Promise<GitHubUser[]> {
+  return fetchAllPages(
+    `${GITHUB_API_BASE}/users/${username}/followers`,
+    token
+  );
 }
 
-export async function fetchFollowing(username: string): Promise<GitHubUser[]> {
-  return fetchAllPages(`${GITHUB_API_BASE}/users/${username}/following`);
+export async function fetchFollowing(
+  username: string,
+  token?: string | null
+): Promise<GitHubUser[]> {
+  return fetchAllPages(
+    `${GITHUB_API_BASE}/users/${username}/following`,
+    token
+  );
 }
 
 export function getUnfollowers(

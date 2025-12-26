@@ -5,6 +5,7 @@ import {
   fetchFollowing,
   getUnfollowers,
   getNotMutuals,
+  RateLimitError,
 } from "../services/github";
 
 interface GithubState {
@@ -16,10 +17,12 @@ interface GithubState {
   activeTab: TabType;
   isLoading: boolean;
   error: string | null;
+  rateLimitReset: number | null;
   setUsername: (username: string) => void;
   setActiveTab: (tab: TabType) => void;
-  fetchData: () => Promise<void>;
+  fetchData: (token?: string | null) => Promise<void>;
   reset: () => void;
+  clearRateLimit: () => void;
 }
 
 export const useGithubStore = create<GithubState>((set, get) => ({
@@ -31,21 +34,22 @@ export const useGithubStore = create<GithubState>((set, get) => ({
   activeTab: "followers",
   isLoading: false,
   error: null,
+  rateLimitReset: null,
 
   setUsername: (username: string) => set({ username }),
 
   setActiveTab: (tab: TabType) => set({ activeTab: tab }),
 
-  fetchData: async () => {
+  fetchData: async (token?: string | null) => {
     const { username } = get();
     if (!username.trim()) return;
 
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, rateLimitReset: null });
 
     try {
       const [followers, following] = await Promise.all([
-        fetchFollowers(username),
-        fetchFollowing(username),
+        fetchFollowers(username, token),
+        fetchFollowing(username, token),
       ]);
 
       const unfollowers = getUnfollowers(followers, following);
@@ -59,10 +63,18 @@ export const useGithubStore = create<GithubState>((set, get) => ({
         isLoading: false,
       });
     } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : "Failed to fetch data",
-        isLoading: false,
-      });
+      if (error instanceof RateLimitError) {
+        set({
+          error: "API rate limit exceeded",
+          rateLimitReset: error.resetTime,
+          isLoading: false,
+        });
+      } else {
+        set({
+          error: error instanceof Error ? error.message : "Failed to fetch data",
+          isLoading: false,
+        });
+      }
     }
   },
 
@@ -75,5 +87,8 @@ export const useGithubStore = create<GithubState>((set, get) => ({
       notMutuals: [],
       activeTab: "followers",
       error: null,
+      rateLimitReset: null,
     }),
+
+  clearRateLimit: () => set({ rateLimitReset: null, error: null }),
 }));

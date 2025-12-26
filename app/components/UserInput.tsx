@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import { useGithubStore } from "../store/useGithubStore";
 import { useFavoritesStore } from "../store/useFavoritesStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 const InputWrapper = styled.div`
   display: flex;
@@ -98,14 +99,16 @@ export default function UserInput() {
   const favorites = useFavoritesStore((state) => state.favorites);
   const addFavorite = useFavoritesStore((state) => state.addFavorite);
   const removeFavorite = useFavoritesStore((state) => state.removeFavorite);
+  const accessToken = useAuthStore((state) => state.accessToken);
 
   useEffect(() => {
     useFavoritesStore.persist.rehydrate();
+    useAuthStore.persist.rehydrate();
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchData();
+    fetchData(accessToken);
   };
 
   const isFavorite = favorites.includes(username);

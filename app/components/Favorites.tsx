@@ -6,6 +6,7 @@ import { FaStar } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { useFavoritesStore } from "../store/useFavoritesStore";
 import { useGithubStore } from "../store/useGithubStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 const FavoritesContainer = styled.div`
   width: 100%;
@@ -82,14 +83,16 @@ export default function Favorites() {
   const favorites = useFavoritesStore((state) => state.favorites);
   const removeFavorite = useFavoritesStore((state) => state.removeFavorite);
   const { setUsername, fetchData } = useGithubStore();
+  const accessToken = useAuthStore((state) => state.accessToken);
 
   useEffect(() => {
     useFavoritesStore.persist.rehydrate();
+    useAuthStore.persist.rehydrate();
   }, []);
 
   const handleSelect = (username: string) => {
     setUsername(username);
-    fetchData();
+    fetchData(accessToken);
   };
 
   const handleRemove = (e: React.MouseEvent, username: string) => {
