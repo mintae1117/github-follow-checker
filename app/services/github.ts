@@ -1,4 +1,4 @@
-import { GitHubUser } from "../types/github";
+import { GitHubUser, GitHubProfile } from "../types/github";
 
 const GITHUB_API_BASE = "https://api.github.com";
 
@@ -104,4 +104,39 @@ export function getNotMutuals(
 ): GitHubUser[] {
   const followingIds = new Set(following.map((f) => f.id));
   return followers.filter((f) => !followingIds.has(f.id));
+}
+
+export async function fetchUserProfile(
+  username: string,
+  token?: string | null
+): Promise<GitHubProfile> {
+  const headers: HeadersInit = {
+    Accept: "application/vnd.github.v3+json",
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${GITHUB_API_BASE}/users/${username}`, {
+    headers,
+  });
+
+  if (response.status === 403 || response.status === 429) {
+    const resetHeader = response.headers.get("X-RateLimit-Reset");
+    const resetTime = resetHeader
+      ? parseInt(resetHeader, 10) * 1000
+      : Date.now() + 3600000;
+    throw new RateLimitError(resetTime);
+  }
+
+  if (response.status === 404) {
+    throw new Error("User not found");
+  }
+
+  if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.status}`);
+  }
+
+  return response.json();
 }

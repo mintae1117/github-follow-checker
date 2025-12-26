@@ -1,8 +1,9 @@
 import { create } from "zustand";
-import { GitHubUser, TabType } from "../types/github";
+import { GitHubUser, GitHubProfile, TabType } from "../types/github";
 import {
   fetchFollowers,
   fetchFollowing,
+  fetchUserProfile,
   getUnfollowers,
   getNotMutuals,
   RateLimitError,
@@ -18,6 +19,7 @@ interface LoadingProgress {
 
 interface GithubState {
   username: string;
+  userProfile: GitHubProfile | null;
   followers: GitHubUser[];
   following: GitHubUser[];
   unfollowers: GitHubUser[];
@@ -40,6 +42,7 @@ interface GithubState {
 
 export const useGithubStore = create<GithubState>((set, get) => ({
   username: "",
+  userProfile: null,
   followers: [],
   following: [],
   unfollowers: [],
@@ -70,6 +73,7 @@ export const useGithubStore = create<GithubState>((set, get) => ({
       error: null,
       rateLimitReset: null,
       currentPage: 1,
+      userProfile: null,
       loadingProgress: {
         followersCount: 0,
         followingCount: 0,
@@ -78,6 +82,10 @@ export const useGithubStore = create<GithubState>((set, get) => ({
     });
 
     try {
+      // Fetch user profile first
+      const profile = await fetchUserProfile(username, token);
+      set({ userProfile: profile });
+
       const followers = await fetchFollowers(username, token, (count) => {
         set((state) => ({
           loadingProgress: {
@@ -148,6 +156,7 @@ export const useGithubStore = create<GithubState>((set, get) => ({
   reset: () =>
     set({
       username: "",
+      userProfile: null,
       followers: [],
       following: [],
       unfollowers: [],
@@ -166,8 +175,14 @@ export const useGithubStore = create<GithubState>((set, get) => ({
   clearRateLimit: () => set({ rateLimitReset: null, error: null }),
 
   getCurrentPageUsers: () => {
-    const { activeTab, followers, following, unfollowers, notMutuals, currentPage } =
-      get();
+    const {
+      activeTab,
+      followers,
+      following,
+      unfollowers,
+      notMutuals,
+      currentPage,
+    } = get();
 
     let users: GitHubUser[];
     switch (activeTab) {

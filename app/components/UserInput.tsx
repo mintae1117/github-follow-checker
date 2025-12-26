@@ -11,7 +11,11 @@ const InputWrapper = styled.div`
   display: flex;
   gap: 12px;
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
+
+  @media (max-width: 640px) {
+    max-width: 100%;
+  }
 `;
 
 const InputContainer = styled.div`

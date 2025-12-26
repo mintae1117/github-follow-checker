@@ -9,8 +9,16 @@ import UserList from "./components/UserList";
 import Favorites from "./components/Favorites";
 import AuthStatus from "./components/AuthStatus";
 import RateLimitBanner from "./components/RateLimitBanner";
+import ThemeToggle from "./components/ThemeToggle";
+import UserProfile from "./components/UserProfile";
 import { useGithubStore } from "./store/useGithubStore";
 import { useAuthStore } from "./store/useAuthStore";
+import { useThemeStore } from "./store/useThemeStore";
+
+const getLogoSrc = (theme: string) =>
+  theme === "dark"
+    ? "/github-mark/github-mark-white.svg"
+    : "/github-mark/github-mark.svg";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -37,6 +45,25 @@ const Header = styled.div`
   align-items: center;
   gap: 16px;
   width: 100%;
+  position: relative;
+`;
+
+const HeaderActions = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+`;
+
+const Logo = styled.img`
+  width: 72px;
+  height: 72px;
+
+  @media (max-width: 640px) {
+    width: 56px;
+    height: 56px;
+  }
 `;
 
 const Title = styled.h1`
@@ -129,18 +156,31 @@ function AuthHandler() {
 }
 
 function HomeContent() {
-  const { followers, following, unfollowers, notMutuals, username, rateLimitReset } =
-    useGithubStore();
+  const {
+    followers,
+    following,
+    unfollowers,
+    notMutuals,
+    username,
+    userProfile,
+    rateLimitReset,
+  } = useGithubStore();
+  const theme = useThemeStore((state) => state.theme);
   const hasData = followers.length > 0 || following.length > 0;
 
   useEffect(() => {
     useAuthStore.persist.rehydrate();
+    useThemeStore.persist.rehydrate();
   }, []);
 
   return (
     <Container>
       <Content>
         <Header>
+          <HeaderActions>
+            <ThemeToggle />
+          </HeaderActions>
+          <Logo src={getLogoSrc(theme)} alt="GitHub Logo" />
           <Title>GitHub Follow Checker</Title>
           <Subtitle>Find out who is not following you back</Subtitle>
           <AuthStatus />
@@ -154,6 +194,13 @@ function HomeContent() {
           <Divider />
 
           <Favorites />
+
+          {userProfile && (
+            <>
+              <Divider />
+              <UserProfile />
+            </>
+          )}
 
           {hasData && (
             <>
