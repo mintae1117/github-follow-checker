@@ -12,9 +12,16 @@ export class RateLimitError extends Error {
   }
 }
 
+export interface FetchProgress {
+  type: "followers" | "following";
+  current: number;
+  total: number | null;
+}
+
 async function fetchAllPages(
   url: string,
-  token?: string | null
+  token?: string | null,
+  onProgress?: (count: number) => void
 ): Promise<GitHubUser[]> {
   const allUsers: GitHubUser[] = [];
   let page = 1;
@@ -35,7 +42,9 @@ async function fetchAllPages(
 
     if (response.status === 403 || response.status === 429) {
       const resetHeader = response.headers.get("X-RateLimit-Reset");
-      const resetTime = resetHeader ? parseInt(resetHeader, 10) * 1000 : Date.now() + 3600000;
+      const resetTime = resetHeader
+        ? parseInt(resetHeader, 10) * 1000
+        : Date.now() + 3600000;
       throw new RateLimitError(resetTime);
     }
 
@@ -49,6 +58,7 @@ async function fetchAllPages(
       hasMore = false;
     } else {
       allUsers.push(...users);
+      onProgress?.(allUsers.length);
       page++;
     }
   }
@@ -58,21 +68,25 @@ async function fetchAllPages(
 
 export async function fetchFollowers(
   username: string,
-  token?: string | null
+  token?: string | null,
+  onProgress?: (count: number) => void
 ): Promise<GitHubUser[]> {
   return fetchAllPages(
     `${GITHUB_API_BASE}/users/${username}/followers`,
-    token
+    token,
+    onProgress
   );
 }
 
 export async function fetchFollowing(
   username: string,
-  token?: string | null
+  token?: string | null,
+  onProgress?: (count: number) => void
 ): Promise<GitHubUser[]> {
   return fetchAllPages(
     `${GITHUB_API_BASE}/users/${username}/following`,
-    token
+    token,
+    onProgress
   );
 }
 
