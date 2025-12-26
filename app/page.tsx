@@ -161,7 +161,6 @@ function HomeContent() {
     following,
     unfollowers,
     notMutuals,
-    username,
     userProfile,
     rateLimitReset,
   } = useGithubStore();

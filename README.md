@@ -1,6 +1,48 @@
 # GitHub Follow Checker
 
-GitHub 사용자의 팔로워/팔로잉 관계를 분석하는 웹 애플리케이션입니다.
+A web application that displays follower/following relationships for GitHub users. [Visit Site](https://github-follow-checker-beta.vercel.app/)
+
+## Features
+
+- **Followers**: List of users who follow you
+- **Following**: List of users you follow
+- **Unfollowers**: Users you follow but don't follow you back
+- **Not Mutuals**: Users who follow you but you don't follow back
+- **Favorites**: Save frequently searched users to favorites (localStorage)
+- **GitHub OAuth**: Increase API rate limit from 60 → 5,000 requests/hour when logged in
+
+## Tech Stack
+
+- **Framework**: Next.js 16
+- **State Management**: Zustand
+- **Styling**: Styled Components + Tailwind CSS
+- **Icons**: React Icons
+- **Language**: TypeScript
+
+## Project Structure
+
+```
+app/
+├── api/
+│   └── auth/          # GitHub OAuth routes
+├── components/        # UI components
+├── services/          # API call functions
+├── store/             # Zustand store
+├── types/             # TypeScript type definitions
+└── lib/               # Utilities (styled-components SSR)
+```
+
+## API Rate Limits
+
+| Status           | Rate Limit          |
+| ---------------- | ------------------- |
+| Not logged in    | 60 requests/hour    |
+| GitHub logged in | 5,000 requests/hour |
+
+
+# korean version
+
+GitHub 사용자의 아이디로 팔로워/팔로잉 관계를 보여주는 웹 애플리케이션입니다. [방문하기](https://github-follow-checker-beta.vercel.app/)
 
 ## 기능
 
@@ -32,38 +74,9 @@ app/
 └── lib/               # 유틸리티 (styled-components SSR)
 ```
 
-## 시작하기
-
-```bash
-# 의존성 설치
-npm install
-
-# 개발 서버 실행
-npm run dev
-
-# 프로덕션 빌드
-npm run build
-```
-
-[http://localhost:3000](http://localhost:3000)에서 확인할 수 있습니다.
-
-## GitHub OAuth 설정 (선택)
-
-API 요청 한도를 늘리려면 GitHub OAuth App을 설정하세요.
-
-1. [GitHub Developer Settings](https://github.com/settings/developers)에서 OAuth App 생성
-2. **Authorization callback URL**: `http://localhost:3000/api/auth/callback`
-3. `.env.local` 파일 생성:
-
-```env
-GITHUB_CLIENT_ID=your_client_id
-GITHUB_CLIENT_SECRET=your_client_secret
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-```
-
 ## API 제한
 
-| 상태 | 요청 한도 |
-|------|----------|
-| 비로그인 | 60회/시간 |
+| 상태          | 요청 한도    |
+| ------------- | ------------ |
+| 비로그인      | 60회/시간    |
 | GitHub 로그인 | 5,000회/시간 |
