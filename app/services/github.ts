@@ -21,7 +21,7 @@ export interface FetchProgress {
 async function fetchAllPages(
   url: string,
   token?: string | null,
-  onProgress?: (count: number) => void
+  onProgress?: (count: number) => void,
 ): Promise<GitHubUser[]> {
   const allUsers: GitHubUser[] = [];
   let page = 1;
@@ -38,6 +38,7 @@ async function fetchAllPages(
   while (hasMore) {
     const response = await fetch(`${url}?per_page=100&page=${page}`, {
       headers,
+      cache: "no-store",
     });
 
     if (response.status === 403 || response.status === 429) {
@@ -69,30 +70,30 @@ async function fetchAllPages(
 export async function fetchFollowers(
   username: string,
   token?: string | null,
-  onProgress?: (count: number) => void
+  onProgress?: (count: number) => void,
 ): Promise<GitHubUser[]> {
   return fetchAllPages(
     `${GITHUB_API_BASE}/users/${username}/followers`,
     token,
-    onProgress
+    onProgress,
   );
 }
 
 export async function fetchFollowing(
   username: string,
   token?: string | null,
-  onProgress?: (count: number) => void
+  onProgress?: (count: number) => void,
 ): Promise<GitHubUser[]> {
   return fetchAllPages(
     `${GITHUB_API_BASE}/users/${username}/following`,
     token,
-    onProgress
+    onProgress,
   );
 }
 
 export function getUnfollowers(
   followers: GitHubUser[],
-  following: GitHubUser[]
+  following: GitHubUser[],
 ): GitHubUser[] {
   const followerIds = new Set(followers.map((f) => f.id));
   return following.filter((f) => !followerIds.has(f.id));
@@ -100,7 +101,7 @@ export function getUnfollowers(
 
 export function getNotMutuals(
   followers: GitHubUser[],
-  following: GitHubUser[]
+  following: GitHubUser[],
 ): GitHubUser[] {
   const followingIds = new Set(following.map((f) => f.id));
   return followers.filter((f) => !followingIds.has(f.id));
@@ -108,7 +109,7 @@ export function getNotMutuals(
 
 export async function fetchUserProfile(
   username: string,
-  token?: string | null
+  token?: string | null,
 ): Promise<GitHubProfile> {
   const headers: HeadersInit = {
     Accept: "application/vnd.github.v3+json",
@@ -120,6 +121,7 @@ export async function fetchUserProfile(
 
   const response = await fetch(`${GITHUB_API_BASE}/users/${username}`, {
     headers,
+    cache: "no-store",
   });
 
   if (response.status === 403 || response.status === 429) {

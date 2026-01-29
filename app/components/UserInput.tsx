@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import styled from "styled-components";
-import { FaStar, FaRegStar, FaSearch } from "react-icons/fa";
+import { FaStar, FaRegStar, FaSearch, FaSync } from "react-icons/fa";
 import { useGithubStore } from "../store/useGithubStore";
 import { useFavoritesStore } from "../store/useFavoritesStore";
 import { useAuthStore } from "../store/useAuthStore";
@@ -33,7 +33,9 @@ const Input = styled.input`
   border-radius: 12px;
   font-size: 16px;
   color: var(--input-text);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 
   &::placeholder {
     color: var(--input-placeholder);
@@ -62,7 +64,9 @@ const StarButton = styled.button<{ $isFavorite: boolean }>`
   justify-content: center;
   color: ${(props) =>
     props.$isFavorite ? "#f59e0b" : "var(--text-secondary)"};
-  transition: transform 0.2s, color 0.2s;
+  transition:
+    transform 0.2s,
+    color 0.2s;
 
   &:hover {
     transform: scale(1.2);
@@ -84,7 +88,9 @@ const Button = styled.button`
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 
   &:hover {
     transform: translateY(-2px);
@@ -95,6 +101,44 @@ const Button = styled.button`
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+  }
+`;
+
+const RefreshButton = styled.button<{ $isSpinning: boolean }>`
+  padding: 14px;
+  background: var(--input-bg);
+  border: 2px solid var(--input-border);
+  border-radius: 12px;
+  font-size: 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    animation: ${(props) =>
+      props.$isSpinning ? "spin 1s linear infinite" : "none"};
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  &:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `;
 
@@ -114,7 +158,9 @@ const LoadingSpinner = styled.div`
 `;
 
 export default function UserInput() {
-  const { username, setUsername, fetchData, isLoading } = useGithubStore();
+  const { username, setUsername, fetchData, isLoading, followers, following } =
+    useGithubStore();
+  const hasData = followers.length > 0 || following.length > 0;
   const favorites = useFavoritesStore((state) => state.favorites);
   const addFavorite = useFavoritesStore((state) => state.addFavorite);
   const removeFavorite = useFavoritesStore((state) => state.removeFavorite);
@@ -128,6 +174,12 @@ export default function UserInput() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     fetchData(accessToken);
+  };
+
+  const handleRefresh = () => {
+    if (username.trim()) {
+      fetchData(accessToken);
+    }
   };
 
   const isFavorite = favorites.includes(username);
@@ -165,6 +217,17 @@ export default function UserInput() {
         <Button type="submit" disabled={isLoading || !username.trim()}>
           {isLoading ? <LoadingSpinner /> : <FaSearch />}
         </Button>
+        {hasData && (
+          <RefreshButton
+            type="button"
+            onClick={handleRefresh}
+            disabled={isLoading || !username.trim()}
+            title="Refresh data"
+            $isSpinning={isLoading}
+          >
+            <FaSync size={16} />
+          </RefreshButton>
+        )}
       </InputWrapper>
     </form>
   );
