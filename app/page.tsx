@@ -11,7 +11,8 @@ import AuthStatus from "./components/AuthStatus";
 import RateLimitBanner from "./components/RateLimitBanner";
 import ThemeToggle from "./components/ThemeToggle";
 import UserProfile from "./components/UserProfile";
-import Tooltip from "./components/Tooltip";
+import AppTooltip, { TOOLTIP_ID } from "./components/Tooltip";
+import Legend from "./components/Legend";
 import { TAB_DESCRIPTIONS } from "./types/github";
 import { useGithubStore } from "./store/useGithubStore";
 import { useAuthStore } from "./store/useAuthStore";
@@ -210,31 +211,45 @@ function HomeContent() {
               <Stats>
                 <StatItem>
                   <StatValue $color="#22c55e">{followers.length}</StatValue>
-                  <Tooltip text={TAB_DESCRIPTIONS.followers}>
-                    <StatLabel>Followers</StatLabel>
-                  </Tooltip>
+                  <StatLabel
+                    data-tooltip-content={TAB_DESCRIPTIONS.followers}
+                    data-tooltip-id={TOOLTIP_ID}
+                  >
+                    Followers
+                  </StatLabel>
                 </StatItem>
                 <StatItem>
                   <StatValue $color="#3b82f6">{following.length}</StatValue>
-                  <Tooltip text={TAB_DESCRIPTIONS.following}>
-                    <StatLabel>Following</StatLabel>
-                  </Tooltip>
+                  <StatLabel
+                    data-tooltip-content={TAB_DESCRIPTIONS.following}
+                    data-tooltip-id={TOOLTIP_ID}
+                  >
+                    Following
+                  </StatLabel>
                 </StatItem>
                 <StatItem>
                   <StatValue $color="#ef4444">{unfollowers.length}</StatValue>
-                  <Tooltip text={TAB_DESCRIPTIONS.unfollowers}>
-                    <StatLabel>Unfollowers</StatLabel>
-                  </Tooltip>
+                  <StatLabel
+                    data-tooltip-content={TAB_DESCRIPTIONS.unfollowers}
+                    data-tooltip-id={TOOLTIP_ID}
+                  >
+                    Unfollowers
+                  </StatLabel>
                 </StatItem>
                 <StatItem>
                   <StatValue $color="#f59e0b">{notMutuals.length}</StatValue>
-                  <Tooltip text={TAB_DESCRIPTIONS.notMutuals}>
-                    <StatLabel>Not Mutuals</StatLabel>
-                  </Tooltip>
+                  <StatLabel
+                    data-tooltip-content={TAB_DESCRIPTIONS.notMutuals}
+                    data-tooltip-id={TOOLTIP_ID}
+                  >
+                    Not Mutuals
+                  </StatLabel>
                 </StatItem>
               </Stats>
 
               <TabButton />
+
+              <Legend />
             </>
           )}
 
@@ -252,6 +267,7 @@ function HomeContent() {
           </a>
         </Footer>
       </Content>
+      <AppTooltip />
     </Container>
   );
 }

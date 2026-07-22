@@ -1,49 +1,14 @@
 "use client";
 
-import { ReactNode } from "react";
-import styled from "styled-components";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
-const Wrapper = styled.span`
-  position: relative;
-  display: inline-flex;
-  cursor: help;
+/**
+ * 앱 공통 툴팁(react-tooltip 단일 인스턴스). page.tsx가 한 번만 렌더링하고,
+ * 트리거 요소는 `data-tooltip-id={TOOLTIP_ID}` + `data-tooltip-content`로
+ * 연결한다. 색은 globals.css의 `.app-tooltip`에서 테마 변수로 매핑한다.
+ */
+export const TOOLTIP_ID = "app-tooltip";
 
-  &::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    width: max-content;
-    max-width: 240px;
-    padding: 6px 10px;
-    border-radius: 6px;
-    background: var(--foreground);
-    color: var(--background);
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.4;
-    text-align: center;
-    white-space: normal;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-
-  &:hover::after,
-  &:focus-within::after {
-    opacity: 1;
-  }
-`;
-
-/** mouseover(또는 내부 포커스) 시 위쪽에 말풍선을 띄우는 순수 CSS 툴팁. */
-export default function Tooltip({
-  children,
-  text,
-}: {
-  children: ReactNode;
-  text: string;
-}) {
-  return <Wrapper data-tooltip={text}>{children}</Wrapper>;
+export default function AppTooltip() {
+  return <ReactTooltip className="app-tooltip" id={TOOLTIP_ID} />;
 }

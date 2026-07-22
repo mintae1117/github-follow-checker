@@ -1,9 +1,9 @@
 "use client";
 
 import styled from "styled-components";
-import { TAB_DESCRIPTIONS, TabType } from "../types/github";
+import { TAB_DESCRIPTIONS, TAB_META, TabType } from "../types/github";
 import { useGithubStore } from "../store/useGithubStore";
-import Tooltip from "./Tooltip";
+import { TOOLTIP_ID } from "./Tooltip";
 
 const TabContainer = styled.div`
   display: flex;
@@ -37,13 +37,6 @@ const Badge = styled.span`
   font-size: 12px;
 `;
 
-const tabConfig: { type: TabType; label: string; color: string }[] = [
-  { type: "followers", label: "Followers", color: "#22c55e" },
-  { type: "following", label: "Following", color: "#3b82f6" },
-  { type: "unfollowers", label: "Unfollowers", color: "#ef4444" },
-  { type: "notMutuals", label: "Not Mutuals", color: "#f59e0b" },
-];
-
 export default function TabButton() {
   const {
     activeTab,
@@ -69,17 +62,18 @@ export default function TabButton() {
 
   return (
     <TabContainer>
-      {tabConfig.map(({ type, label, color }) => (
-        <Tooltip key={type} text={TAB_DESCRIPTIONS[type]}>
-          <Tab
-            $active={activeTab === type}
-            $color={color}
-            onClick={() => setActiveTab(type)}
-          >
-            {label}
-            <Badge>{getCounts(type)}</Badge>
-          </Tab>
-        </Tooltip>
+      {TAB_META.map(({ type, label, color }) => (
+        <Tab
+          key={type}
+          $active={activeTab === type}
+          $color={color}
+          data-tooltip-content={TAB_DESCRIPTIONS[type]}
+          data-tooltip-id={TOOLTIP_ID}
+          onClick={() => setActiveTab(type)}
+        >
+          {label}
+          <Badge>{getCounts(type)}</Badge>
+        </Tab>
       ))}
     </TabContainer>
   );
