@@ -1,8 +1,9 @@
 "use client";
 
 import styled from "styled-components";
-import { TabType } from "../types/github";
+import { TAB_DESCRIPTIONS, TabType } from "../types/github";
 import { useGithubStore } from "../store/useGithubStore";
+import Tooltip from "./Tooltip";
 
 const TabContainer = styled.div`
   display: flex;
@@ -69,15 +70,16 @@ export default function TabButton() {
   return (
     <TabContainer>
       {tabConfig.map(({ type, label, color }) => (
-        <Tab
-          key={type}
-          $active={activeTab === type}
-          $color={color}
-          onClick={() => setActiveTab(type)}
-        >
-          {label}
-          <Badge>{getCounts(type)}</Badge>
-        </Tab>
+        <Tooltip key={type} text={TAB_DESCRIPTIONS[type]}>
+          <Tab
+            $active={activeTab === type}
+            $color={color}
+            onClick={() => setActiveTab(type)}
+          >
+            {label}
+            <Badge>{getCounts(type)}</Badge>
+          </Tab>
+        </Tooltip>
       ))}
     </TabContainer>
   );

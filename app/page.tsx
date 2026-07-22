@@ -11,6 +11,8 @@ import AuthStatus from "./components/AuthStatus";
 import RateLimitBanner from "./components/RateLimitBanner";
 import ThemeToggle from "./components/ThemeToggle";
 import UserProfile from "./components/UserProfile";
+import Tooltip from "./components/Tooltip";
+import { TAB_DESCRIPTIONS } from "./types/github";
 import { useGithubStore } from "./store/useGithubStore";
 import { useAuthStore } from "./store/useAuthStore";
 import { useThemeStore } from "./store/useThemeStore";
@@ -208,19 +210,27 @@ function HomeContent() {
               <Stats>
                 <StatItem>
                   <StatValue $color="#22c55e">{followers.length}</StatValue>
-                  <StatLabel>Followers</StatLabel>
+                  <Tooltip text={TAB_DESCRIPTIONS.followers}>
+                    <StatLabel>Followers</StatLabel>
+                  </Tooltip>
                 </StatItem>
                 <StatItem>
                   <StatValue $color="#3b82f6">{following.length}</StatValue>
-                  <StatLabel>Following</StatLabel>
+                  <Tooltip text={TAB_DESCRIPTIONS.following}>
+                    <StatLabel>Following</StatLabel>
+                  </Tooltip>
                 </StatItem>
                 <StatItem>
                   <StatValue $color="#ef4444">{unfollowers.length}</StatValue>
-                  <StatLabel>Unfollowers</StatLabel>
+                  <Tooltip text={TAB_DESCRIPTIONS.unfollowers}>
+                    <StatLabel>Unfollowers</StatLabel>
+                  </Tooltip>
                 </StatItem>
                 <StatItem>
                   <StatValue $color="#f59e0b">{notMutuals.length}</StatValue>
-                  <StatLabel>Not Mutuals</StatLabel>
+                  <Tooltip text={TAB_DESCRIPTIONS.notMutuals}>
+                    <StatLabel>Not Mutuals</StatLabel>
+                  </Tooltip>
                 </StatItem>
               </Stats>
 
